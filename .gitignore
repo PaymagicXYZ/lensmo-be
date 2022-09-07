@@ -1,0 +1,7 @@
+.env
+node_modules/
+
+/**/*.js
+
+.DS_Store
+.idea

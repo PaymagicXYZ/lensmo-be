@@ -1,0 +1,29 @@
+{
+  "name": "lensmo-be",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaymagicXYZ/lensmo-be.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PaymagicXYZ/lensmo-be/issues"
+  },
+  "homepage": "https://github.com/PaymagicXYZ/lensmo-be#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^18.7.15",
+    "typescript": "^4.8.2"
+  }
+}
