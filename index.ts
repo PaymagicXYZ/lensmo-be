@@ -24,7 +24,7 @@ console.log("Claimed escrow wallets: ", claimedEscrowWalletCount)
 
 const availableEscrowWallets = totalEscrowWalletCount - claimedEscrowWalletCount
 //const newEscrowWalletsNeeded = targetEscrowWallets - availableEscrowWallets
-const newEscrowWalletsNeeded = 4;
+const newEscrowWalletsNeeded = 19;
 console.log("Escrow wallets needed: ", newEscrowWalletsNeeded)
 
 let newSafesAdded = 0;

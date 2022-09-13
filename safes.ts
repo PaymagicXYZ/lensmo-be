@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-const signerAddress = "0x74427681c620de258aa53a382d6a4c865738a06c"
+const walletExtraSignerAddress = "0x74427681c620DE258Aa53a382d6a4C865738A06C"
 
 export const createEscrowWallet = async (chain: string): Promise<string | undefined> => {
     const url = `https://paymagicapi.com/v1/${chain}/account`
@@ -10,7 +10,7 @@ export const createEscrowWallet = async (chain: string): Promise<string | undefi
     const response = await axios.post(
         url,
         {
-            "signers": [signerAddress]
+            "signers": [walletExtraSignerAddress]
         },
         {
             headers: {
