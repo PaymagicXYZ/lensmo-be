@@ -13,7 +13,7 @@ async function main() {
     // Get claim wallet address for user
     //const claimable = await getClaimableForUser(socialUser);
 
-    const claimSafeAddress = "0xf67461887C0dABBD78C02F88fb562F1df8Ee0B98";
+    const claimSafeAddress = "0xaA83B95C99cd4DB91B1C31B8DAc5ccbb1Ec60af0";
     const newOwnerAddress = "0xFF94D9B276e5EA81BE66b51FdD06A1000254d92f";
 
     console.log(`Changing owner from ${paymagicHotSignerAddress} to ${newOwnerAddress} on safe at ${claimSafeAddress}`)
