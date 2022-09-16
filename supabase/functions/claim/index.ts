@@ -8,16 +8,16 @@ serve(async (req) => {
     console.log(req)
 
     // Get user_id by decrypting the JWT from the header
-    const user_id2 = await getUserIdFromReq(req)
+    const user_id = await getUserIdFromReq(req)
 
-    // Need to extract user_id from logged-in user using JWT - hardcoded for now
-    const user_id = "twitter:corbpage"
+    // For Testing:
+    // const user_id = "twitter:corbpage"
 
     if (user_id) {
-
-        // Chain needs to be static, current DB design doesn't support multi chains
-        // const chain = 'matic'
         // Get claimSafeAddress from receive_wallets table based on socialUser
+
+        // For Testing:        
+        // const chain = 'matic'
         // const claimSafeAddress = "0x2fae3FBcEee7B8CbE1D153b879DD50ac70c92CD8"
         const [chain, claimSafeAddress] = await getReceiveWalletForUserId(user_id)
 
@@ -57,27 +57,20 @@ const getUserIdFromReq = async (
     try {
         // Get JWT from Header: Authorization: Bearer <token>
         const authorization = req.headers.get('Authorization');
-        // const jwt = authorization.replace('Bearer ', '')
-        const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjYzMjY2NTkwLCJzdWIiOiIwNjhlY2Y0NS1hN2U4LTRiOTgtYWUxNy1lZWNiMDcwNjc4M2UiLCJlbWFpbCI6Im1pa2UwMDA3MDhAbWUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJnaXRodWIiLCJwcm92aWRlcnMiOlsiZ2l0aHViIiwiZGlzY29yZCJdfSwidXNlcl9tZXRhZGF0YSI6eyJhdmF0YXJfdXJsIjoiaHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXZhdGFycy81NDQyNTE3NTk2Nzg0NTU4MTIvMzMzYjgxOWYxOTI2ZGM3YzhhMjM5NTQ0Y2NkOTdjMzUucG5nIiwiZW1haWwiOiJtaWtlMDAwNzA4QG1lLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJtaWtlbHhjIiwiaXNzIjoiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkiLCJuYW1lIjoibWlrZWx4YyM4OTk5IiwicGljdHVyZSI6Imh0dHBzOi8vY2RuLmRpc2NvcmRhcHAuY29tL2F2YXRhcnMvNTQ0MjUxNzU5Njc4NDU1ODEyLzMzM2I4MTlmMTkyNmRjN2M4YTIzOTU0NGNjZDk3YzM1LnBuZyIsInByZWZlcnJlZF91c2VybmFtZSI6Im1pa2VseGMiLCJwcm92aWRlcl9pZCI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInN1YiI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInVzZXJfbmFtZSI6Im1pa2VseGMifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJzZXNzaW9uX2lkIjoiM2RhMjBkYTMtYzQyYy00YmY3LTg5OTMtZTljMDhjNDZjYzBjIn0.eYbdZw2fTR3QZlk2XAVkBbZn-1uHNbeGLR0VkC0iCWc'
+        const jwt = authorization.replace('Bearer ', '')
+        // For Testing:
+        // const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjYzMjY2NTkwLCJzdWIiOiIwNjhlY2Y0NS1hN2U4LTRiOTgtYWUxNy1lZWNiMDcwNjc4M2UiLCJlbWFpbCI6Im1pa2UwMDA3MDhAbWUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJnaXRodWIiLCJwcm92aWRlcnMiOlsiZ2l0aHViIiwiZGlzY29yZCJdfSwidXNlcl9tZXRhZGF0YSI6eyJhdmF0YXJfdXJsIjoiaHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXZhdGFycy81NDQyNTE3NTk2Nzg0NTU4MTIvMzMzYjgxOWYxOTI2ZGM3YzhhMjM5NTQ0Y2NkOTdjMzUucG5nIiwiZW1haWwiOiJtaWtlMDAwNzA4QG1lLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJtaWtlbHhjIiwiaXNzIjoiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkiLCJuYW1lIjoibWlrZWx4YyM4OTk5IiwicGljdHVyZSI6Imh0dHBzOi8vY2RuLmRpc2NvcmRhcHAuY29tL2F2YXRhcnMvNTQ0MjUxNzU5Njc4NDU1ODEyLzMzM2I4MTlmMTkyNmRjN2M4YTIzOTU0NGNjZDk3YzM1LnBuZyIsInByZWZlcnJlZF91c2VybmFtZSI6Im1pa2VseGMiLCJwcm92aWRlcl9pZCI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInN1YiI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInVzZXJfbmFtZSI6Im1pa2VseGMifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJzZXNzaW9uX2lkIjoiM2RhMjBkYTMtYzQyYy00YmY3LTg5OTMtZTljMDhjNDZjYzBjIn0.eYbdZw2fTR3QZlk2XAVkBbZn-1uHNbeGLR0VkC0iCWc'
+        
+        const claims: any = jose.decodeJwt(jwt)
+        console.log(`JWT Claims: `, claims)
 
-        console.log(authorization)
-        console.log(jwt)
-        // Decode JWT
-        
-        // let payload: string | Uint8Array;
-        // let protectedHeader: Uint8Array | KeyLike;
-        const verifyResult: any = await jose.jwtVerify(jwt, Deno.env.get('SUPABASE_JWT_SECRET') as KeyLike);
-        console.log(verifyResult)        
-        const decryptedResult: any = await jose.jwtDecrypt(jwt, Deno.env.get('SUPABASE_JWT_SECRET') as KeyLike);
-        
-        console.log(decryptedResult)
-        // console.log(payload)
-        
-        
         // Get user_id from JWT (provider:username)
+        const provider = claims?.app_metadata?.provider
+        const username = claims?.user_metadata?.user_name
+        console.log(`Provider: `, provider)
+        console.log(`Username: `, username)
 
-
-
+        return `${provider}:${username}`
     } catch (error) {
         console.error(error);
         return null
