@@ -38,6 +38,7 @@ serve(async (req) => {
         }
     }
 
+    console.log(`Not a valid request, returning 400`)
     return new Response(
         JSON.stringify({}),
         {
@@ -70,7 +71,11 @@ const getUserIdFromReq = async (
         console.log(`Provider: `, provider)
         console.log(`Username: `, username)
 
-        return `${provider}:${username}`
+        if(provider && username) {
+            return `${provider}:${username}`
+        } else {
+            return null
+        }
     } catch (error) {
         console.error(error);
         return null
