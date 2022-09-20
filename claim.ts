@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv'
-import {getClaimableForUser} from "./data.js";
+import {getClaimableForUser} from "./data";
 dotenv.config()
 
 const paymagicBaseUrl = "https://paymagicapi.com/v1"

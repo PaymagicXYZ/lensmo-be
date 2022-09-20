@@ -3,7 +3,7 @@ import {
     getTotalEscrowWalletCount,
     getClaimedEscrowWalletCount,
     addEscrowSafe
-} from "./data.js";
+} from "./data";
 import {createEscrowWallet} from "./safes.js";
 
 const chain = "matic"
