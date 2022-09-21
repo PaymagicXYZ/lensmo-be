@@ -4,6 +4,19 @@ import * as jose from "https://deno.land/x/jose/index.ts"
 const paymagicHotSignerAddress = "0x2BB655A15c96776B5A8Fa75EFD22B2c030098FfF"
 
 serve(async (req) => {
+    // This is needed if you're planning to invoke your function from a browser.
+    if (req.method === 'OPTIONS') {
+        return new Response(
+            'ok', 
+            { 
+                "headers": {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*"
+                }
+            }
+        )
+    }
+
     const { newOwnerAddress } = await req.json()
     console.log(req)
 
@@ -31,7 +44,11 @@ serve(async (req) => {
                     JSON.stringify(paymagicResponse),
                     {
                         "status": 200,
-                        "headers": { "Content-Type": "application/json" }
+                        "headers": {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Headers": "*"
+                        }
                     }
                 )
             }
@@ -43,7 +60,11 @@ serve(async (req) => {
         JSON.stringify({}),
         {
             "status": 400,
-            "headers": { "Content-Type": "application/json" }
+            "headers": { 
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*"
+            }
         }
     )
 })
