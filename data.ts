@@ -63,7 +63,7 @@ export const addEscrowSafe = async(chain: string, safeAddress: string) => {
         "Prefer": "resolution=merge-duplicates"
     }
 
-    const response = axios.post(
+    return await axios.post(
         "escrow_wallets",
         {
             "chain": chain,
@@ -72,5 +72,4 @@ export const addEscrowSafe = async(chain: string, safeAddress: string) => {
         },
         config
     )
-    return response
 }
