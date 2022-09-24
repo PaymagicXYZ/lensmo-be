@@ -7,8 +7,8 @@ serve(async (req) => {
     // This is needed if you're planning to invoke your function from a browser.
     if (req.method === 'OPTIONS') {
         return new Response(
-            'ok', 
-            { 
+            'ok',
+            {
                 "headers": {
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Headers": "*"
@@ -32,7 +32,7 @@ serve(async (req) => {
         // For Testing:        
         // const chain = 'matic'
         // const claimSafeAddress = "0x2fae3FBcEee7B8CbE1D153b879DD50ac70c92CD8"
-        const [chain, claimSafeAddress] = await getReceiveWalletForUserId(user_id)
+        const [chain, claimSafeAddress, walletId] = await getReceiveWalletForUserId(user_id)
 
         if (claimSafeAddress) {
             console.log(`Changing owner from ${paymagicHotSignerAddress} to ${newOwnerAddress} on safe at ${chain}:${claimSafeAddress}`)
@@ -40,17 +40,21 @@ serve(async (req) => {
             console.log(`Paymagic call complete: `, paymagicResponse)
 
             if (paymagicResponse && paymagicResponse.status === 200) {
-                return new Response(
-                    JSON.stringify(paymagicResponse),
-                    {
-                        "status": 200,
-                        "headers": {
-                            "Content-Type": "application/json",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Headers": "*"
+                // Update wallet status to claimed
+                const updateStatus = await updateWalletStatus(walletId)
+                if (updateStatus) {
+                    return new Response(
+                        JSON.stringify(paymagicResponse),
+                        {
+                            "status": 200,
+                            "headers": {
+                                "Content-Type": "application/json",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Headers": "*"
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -60,7 +64,7 @@ serve(async (req) => {
         JSON.stringify({}),
         {
             "status": 400,
-            "headers": { 
+            "headers": {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "*"
@@ -71,7 +75,7 @@ serve(async (req) => {
 
 interface Headers {
     authorization: string;
-  }
+}
 
 const getUserIdFromReq = async (
     req: any
@@ -82,7 +86,7 @@ const getUserIdFromReq = async (
         const jwt = authorization.replace('Bearer ', '')
         // For Testing:
         // const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNjYzMjY2NTkwLCJzdWIiOiIwNjhlY2Y0NS1hN2U4LTRiOTgtYWUxNy1lZWNiMDcwNjc4M2UiLCJlbWFpbCI6Im1pa2UwMDA3MDhAbWUuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJnaXRodWIiLCJwcm92aWRlcnMiOlsiZ2l0aHViIiwiZGlzY29yZCJdfSwidXNlcl9tZXRhZGF0YSI6eyJhdmF0YXJfdXJsIjoiaHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXZhdGFycy81NDQyNTE3NTk2Nzg0NTU4MTIvMzMzYjgxOWYxOTI2ZGM3YzhhMjM5NTQ0Y2NkOTdjMzUucG5nIiwiZW1haWwiOiJtaWtlMDAwNzA4QG1lLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJtaWtlbHhjIiwiaXNzIjoiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkiLCJuYW1lIjoibWlrZWx4YyM4OTk5IiwicGljdHVyZSI6Imh0dHBzOi8vY2RuLmRpc2NvcmRhcHAuY29tL2F2YXRhcnMvNTQ0MjUxNzU5Njc4NDU1ODEyLzMzM2I4MTlmMTkyNmRjN2M4YTIzOTU0NGNjZDk3YzM1LnBuZyIsInByZWZlcnJlZF91c2VybmFtZSI6Im1pa2VseGMiLCJwcm92aWRlcl9pZCI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInN1YiI6IjU0NDI1MTc1OTY3ODQ1NTgxMiIsInVzZXJfbmFtZSI6Im1pa2VseGMifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJzZXNzaW9uX2lkIjoiM2RhMjBkYTMtYzQyYy00YmY3LTg5OTMtZTljMDhjNDZjYzBjIn0.eYbdZw2fTR3QZlk2XAVkBbZn-1uHNbeGLR0VkC0iCWc'
-        
+
         const claims: any = jose.decodeJwt(jwt)
         console.log(`JWT Claims: `, claims)
 
@@ -107,16 +111,16 @@ const getReceiveWalletForUserId = async (
     user_id: string
 ): Promise<any | undefined> => {
     try {
-        const url:string = `https://rvhpnxjvpgatvgaubbyt.supabase.co/rest/v1/escrow_users?select=id,user_id,created_at,updated_at,receive_wallet_id(chain,wallet_address,wallet_type,status,created_at,updated_at)&user_id=eq.${user_id}`
-    
+        const url:string = `https://rvhpnxjvpgatvgaubbyt.supabase.co/rest/v1/escrow_users?select=user_id,receive_wallet_id(id,chain,wallet_address)&user_id=eq.${user_id}`
+
         let myHeaders = new Headers();
         myHeaders.append("apikey", Deno.env.get('SUPABASE_ANON_PUBLIC_API_KEY') as string);
-    
+
         let requestOptions:object = {
             method: 'GET',
             headers: myHeaders
         };
-    
+
         console.log(`Supabase Fetch: ${url} ${JSON.stringify(requestOptions)} }`)
         const response = await fetch(url, requestOptions)
 
@@ -125,11 +129,42 @@ const getReceiveWalletForUserId = async (
         console.log(`User data: `, userData)
         const claimSafeAddress = userData[0]['receive_wallet_id']['wallet_address']
         const chain = userData[0]['receive_wallet_id']['chain']
+        const walletId = userData[0]['receive_wallet_id']['id']
 
-        return [chain, claimSafeAddress]
+        return [chain, claimSafeAddress, walletId]
     } catch (error) {
         console.error(error);
-        return [null, null]
+        return [null, null, null]
+    }
+}
+
+const updateWalletStatus = async (
+    walletId: string
+): Promise<boolean> => {
+    try {
+        const url:string = `https://rvhpnxjvpgatvgaubbyt.supabase.co/rest/v1/receive_wallets?id=eq.${walletId}`
+
+        let myHeaders = new Headers();
+        // Does this API KEY have permissions to update?
+        myHeaders.append("apikey", Deno.env.get('SUPABASE_ANON_PUBLIC_API_KEY') as string);
+        myHeaders.append("Authorization", "Bearer " + Deno.env.get('SUPABASE_ANON_PUBLIC_API_KEY') as string);
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Prefer", "return=representation");
+
+        let requestOptions:object = {
+            method: 'PATCH',
+            headers: myHeaders,
+            body: JSON.stringify({"status": "claimed"})
+        };
+
+        console.log(`Supabase Fetch: ${url} ${JSON.stringify(requestOptions)} }`)
+        const response = await fetch(url, requestOptions)
+        console.log(`Supabase call complete: `, response)
+        // What status code is returned for successful update?
+        return response.status > 200 && response.status < 300;
+    } catch (error) {
+        console.error(error);
+        return false
     }
 }
 
@@ -142,11 +177,11 @@ const changeSafeOwnerTransaction = async (
         const paymagicBaseUrl = "https://paymagicapi.com/v1"
         const walletExtraSignerAddress = "0x74427681c620DE258Aa53a382d6a4C865738A06C"
         const paymagicUrl:string = `${paymagicBaseUrl}/${chain}/account/${claimSafeAddress}/custom`
-    
+
         let myHeaders = new Headers();
         myHeaders.append("X-API-KEY", Deno.env.get('PAYMAGIC_API_KEY') as string );
         myHeaders.append("Content-Type", "application/json" as string);
-    
+
         let body:object = {
             "to": claimSafeAddress,
             "value": "0",
@@ -157,22 +192,22 @@ const changeSafeOwnerTransaction = async (
                 newOwnerAddress
             )
         }
-    
+
         let requestOptions:object = {
             method: 'POST',
             headers: myHeaders,
             body: JSON.stringify(body)
         };
-    
+
         console.log(`Paymagic Fetch: ${paymagicUrl} ${JSON.stringify(requestOptions)} }`)
         const response = await fetch(paymagicUrl, requestOptions)
-    
-        return response 
 
-        } catch (error) {
-            console.error(error);
-            return {status: 400}
-        }
+        return response
+
+    } catch (error) {
+        console.error(error);
+        return {status: 400}
+    }
 
 
 
