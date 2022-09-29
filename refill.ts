@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv'
 import {ethers} from "ethers";
 dotenv.config()
 
-const targetWalletCount = 100;
+const targetWalletCount = 300;
 
 const supabaseBaseUrl = 'https://rvhpnxjvpgatvgaubbyt.supabase.co/rest/v1'
 const paymagicBaseUrl = 'https://paymagicapi.com/v1'
